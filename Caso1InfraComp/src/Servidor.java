@@ -29,16 +29,11 @@ public class Servidor extends Thread
 	public void run() 
 	{
 		while(buffer.getNumClientes()!=0)
-		{
-			Mensaje m;
-			try {
-				m = buffer.retirar();
-				m.procesar();
-				System.out.println(m.getMensaje());
-				synchronized(m){m.notify();}
-			} catch (InterruptedException e) {
-				System.out.println(e);
-			}
+		{	
+				while(!buffer.retirar())
+				{
+					yield();
+				}			
 		}
 
 	}
