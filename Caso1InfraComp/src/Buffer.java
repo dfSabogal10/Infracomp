@@ -15,15 +15,14 @@ public class Buffer extends Thread
 	{
 		this.capacidad=Capacidad;
 		mensajes= new ArrayList();
-
-		//numClientes=numTsClientes;
+		numClientes=numTsClientes;
 		//prueba
-			numClientes=5;
-			for (int i = 0; i < capacidad; i++) {
-				Mensaje m = new Mensaje(i);
-				mensajes.add(m);
-				System.out.println(m.getMensaje());
-			}
+//			numClientes=5;
+//			for (int i = 0; i < capacidad; i++) {
+//				Mensaje m = new Mensaje(i);
+//				mensajes.add(m);
+//				System.out.println(m.getMensaje());
+//			}
 	}
 	
 	//Métodos
