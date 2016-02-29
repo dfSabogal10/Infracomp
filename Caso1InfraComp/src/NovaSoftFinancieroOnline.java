@@ -17,10 +17,9 @@ public class NovaSoftFinancieroOnline {
 	
 	public NovaSoftFinancieroOnline(int numTsServidor, int numTsClientes,int numConsultasClientes, int capBuffer)
 	{
-		b= new Buffer(capBuffer);
+		b= new Buffer(capBuffer, numTsClientes);
 		s= new Servidor(numTsServidor, b);
-		c= new Clientes(numTsClientes,numConsultasClientes, b);
-			
+		c= new Clientes(numTsClientes,numConsultasClientes, b);		
 	}
 	
 	//Main
@@ -31,7 +30,7 @@ public class NovaSoftFinancieroOnline {
 	 */
 	public static void main(String[] args) throws IOException 
 	{
-		BufferedReader in= new BufferedReader(new FileReader(new File("/data/parametros.txt")));
+		BufferedReader in= new BufferedReader(new FileReader(new File("./data/parametros.txt")));
 		String line= in.readLine();
 		int numTsServidor = Integer.parseInt(line);
 		line= in.readLine();
