@@ -1,0 +1,397 @@
+package co.edu.uniandes.iteracion2.dao;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.Random;
+
+import co.edu.uniandes.iteracion2.fachada.BancAndes;
+import co.edu.uniandes.iteracion2.fachada.Cuenta;
+import co.edu.uniandes.iteracion2.fachada.Usuario;
+import oracle.sql.DATE;
+
+public class ConsultaDAOMio {
+
+	private BancAndes one;
+
+	private static final String ARCHIVO_CONEXION = "data/conexion.properties";
+
+	/**
+	 * conexion con la base de datos
+	 */
+	public Connection conexion;
+
+	/**
+	 * nombre del usuario para conectarse a la base de datos.
+	 */
+	private static String usuario = "ISIS2304131520";
+
+	/**
+	 * clave de conexión a la base de datos.
+	 */
+	private static String clave ="AB6zptSv4Ca6";
+	/**
+	 * URL al cual se debe conectar para acceder a la base de datos.
+	 */
+	private static String cadenaConexion = "jdbc:oracle:thin:@fn3.oracle.virtual.uniandes.edu.co:1521:prod";
+
+	//METODOS
+	public void inicializar()
+	{
+		try
+		{
+			File arch= new File(ARCHIVO_CONEXION);
+			Properties prop = new Properties();
+			FileInputStream in = new FileInputStream( arch );
+
+			prop.load( in );
+			in.close( );
+
+			cadenaConexion = prop.getProperty("url");	// El url, el usuario y passwd deben estar en un archivo de propiedades.
+			// url: "jdbc:oracle:thin:@chie.uniandes.edu.co:1521:chie10";
+			usuario = prop.getProperty("usuario");	// "s2501aXX";
+			clave = prop.getProperty("clave");	// "c2501XX";
+			final String driver = prop.getProperty("driver");
+			Class.forName(driver);
+
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}	
+	}
+
+	private void establecerConexion() throws SQLException
+	{
+		try
+		{
+			conexion = DriverManager.getConnection(cadenaConexion,usuario,clave);
+//			conexion.commit();
+		}
+		catch( SQLException exception )
+		{
+			throw new SQLException( "ERROR: ConsultaDAO obteniendo una conexin." );
+		}
+	}
+	public void closeConnection(Connection connection) throws Exception {        
+		try {
+			connection.close();
+			connection = null;
+		} catch (SQLException exception) {
+			throw new Exception("ERROR: ConsultaDAO: closeConnection() = cerrando una conexión.");
+		}
+	} 
+
+
+	//Consultas 
+	public Usuario AutenticarUsuario(int pid, int pclave)
+	{
+
+
+		PreparedStatement prepStmt = null;
+		String agregar = "SELECT * FROM USUARIO U WHERE U.ID =" +pid+" AND U.CLAVE = "+pclave ;
+
+
+		try {
+			establecerConexion();
+
+			prepStmt = conexion.prepareStatement(agregar);
+
+			ResultSet rs = prepStmt.executeQuery();
+
+			int id = rs.getInt("ID");
+			int clave = rs.getInt("CLAVE");
+			String nombre = rs.getString("NOMBRE");
+			int tipoDoc = rs.getInt("TIPO");
+			if(nombre!=null){
+				Usuario d= new Usuario(nombre, clave, id, "Cliente", tipoDoc,"");
+				one=new BancAndes();
+				one.iniciarsesion(d);
+				return d;
+			}
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+		return null;
+
+	}
+	public Usuario AutenticarEmpleado(int pid, int pclave)
+	{
+
+
+		PreparedStatement prepStmt = null;
+		String agregar = "SELECT * FROM EMPLEADO U WHERE U.ID =" +pid+" AND U.CLAVE = "+pclave ;
+
+
+		try {
+			establecerConexion();
+
+			prepStmt = conexion.prepareStatement(agregar);
+
+			ResultSet rs = prepStmt.executeQuery();
+
+			int id = rs.getInt("ID");
+			int clave = rs.getInt("CLAVE");
+			String nombre = rs.getString("NOMBRE");
+			String tipo = rs.getString("TIPO");
+			if(nombre!=null){
+				Usuario d= new Usuario(nombre, clave, id, tipo,0,"");
+				one=new BancAndes();
+				one.iniciarsesion(d);
+				return d;
+			}
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+		return null;
+
+	}
+
+	public void registrarEmpleado(int pid, int pclave, String Nombre, int tipodoc, String tipo, String suc){
+
+
+		PreparedStatement prepStmt = null;
+	
+
+		try {
+			establecerConexion();
+
+//			prepStmt = conexion.prepareStatement(agregar);
+
+//			ResultSet rs = prepStmt.executeQuery();
+//
+//			int id = rs.getInt("ID");
+//			if(id >0 && one.darActual().darTipo().equals("Asesor")){
+				String add="INSERT INTO EMPLEADO (ID, CLAVE, NOMSUCURSAL,TIPO) VALUES ("+pid+","+pclave+",'"+suc+"','"+tipo+"')";
+				prepStmt=conexion.prepareStatement(add);
+				ResultSet rs = prepStmt.executeQuery();
+//			}
+//			prepStmt=conexion.prepareStatement(cli);
+//			rs = prepStmt.executeQuery();
+//			id = rs.getInt("ID");
+//			if(tipo.equals("Cliente")){
+//			if(id >0 && (one.darActual().darTipo().equals("Gerente")||one.darActual().darTipo().equals("Cajero"))){
+//				String add="INSERT INTO USUARIO (ID, CLAVE, NOMBRE,TIPO) VALUES ("+pid+","+pclave+","+Nombre+","+tipodoc+")";
+//				conexion.prepareStatement(add);
+//			}
+//			}
+
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+	}
+	public void registrarUsuario(int pid, int pclave, String Nombre, int tipodoc, String tipo, String suc){
+
+
+		PreparedStatement prepStmt = null;
+	
+
+		try {
+			establecerConexion();
+
+//			prepStmt = conexion.prepareStatement(agregar);
+
+//			ResultSet rs = prepStmt.executeQuery();
+//
+//			int id = rs.getInt("ID");
+//			if(id >0 && one.darActual().darTipo().equals("Asesor")){
+//				String add="INSERT INTO EMPLEADO (ID, CLAVE, NOMSUCURSAL,TIPO) VALUES ("+pid+","+pclave+",'"+suc+"','"+tipo+"')";
+				
+//			}
+//			prepStmt=conexion.prepareStatement(cli);
+//			rs = prepStmt.executeQuery();
+//			id = rs.getInt("ID");
+//			if(tipo.equals("Cliente")){
+//			if(id >0 && (one.darActual().darTipo().equals("Gerente")||one.darActual().darTipo().equals("Cajero"))){
+				String add="INSERT INTO USUARIO (ID, CLAVE, NOMBRE,TIPO,EDAD) VALUES ("+pid+","+pclave+",'"+Nombre+"',"+tipodoc+", 18)";
+
+				prepStmt=conexion.prepareStatement(add);
+				ResultSet rs = prepStmt.executeQuery();
+//			}
+//			}
+
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+	}
+	public void registrarSucursal( String Nombre, String pDir, String tipo){
+
+
+		PreparedStatement prepStmt = null;
+		String add="INSERT INTO SUCURSAL (NOMBRE , DIRECCION , NOMBREBANCO ,TIPO ) VALUES ('"+Nombre+"','"+pDir+"', 'BancAndes' ,'"+tipo+"')";
+
+
+		try {
+	
+			establecerConexion();
+		
+
+
+//			ResultSet rs = prepStmt.executeQuery();
+
+//			String nombre = rs.getString("NOMBRE");
+//			if(one.darActual().darTipo().equals("Asesor")){
+			System.out.println(add);
+				prepStmt =conexion.prepareStatement(add);
+				System.out.println(add+"fff");
+				ResultSet rs = prepStmt.executeQuery();
+			
+				System.out.println("ok"+Nombre);
+//			}
+			
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+	}
+	public void registrarCuenta( int pnumero, int pidus, int pcant, String tipo){
+
+
+		PreparedStatement prepStmt = null;
+
+		
+
+
+		try {
+			establecerConexion();
+
+			
+
+			
+//			if(num!=0 && one.darActual().darTipo().equals("Gerente")){
+				String add="INSERT INTO CUENTA (NUMERO, CANTIDADDINERO, IDCLIENTE ,TIPO) VALUES ("+pnumero+","+pcant+", "+pidus+",'"+tipo+"')";
+				prepStmt= conexion.prepareStatement(add);
+				ResultSet rs = prepStmt.executeQuery();
+//			}
+			
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+	}
+	public void registrarCredito( int pnumero, double pint, int pidus, int pcant, String tipo){
+
+
+		PreparedStatement prepStmt = null;
+		String agregar = "SELECT * FROM CREDITO U WHERE U.CODIGO =" +pnumero ;
+		
+
+
+		try {
+			establecerConexion();
+
+			prepStmt = null;
+
+		
+//			if(num!=0 && one.darActual().darTipo().equals("Gerente")){
+				String add="INSERT INTO CREDITO (CODIGO,INTERES, CANTIDADDINERO, IDCLIENTE ,TIPO) VALUES ("+pnumero+","+5+","+pcant+", "+pidus+",'"+tipo+"')";
+				
+				prepStmt=conexion.prepareStatement(add);
+				ResultSet rs = prepStmt.executeQuery();
+//			}
+//			
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+
+		}
+	}
+	public void hacerTransCuenta(int numtras, int idcuenta,int cant,String tipo){
+		PreparedStatement prepStmt = null;
+	
+		try {
+			Date fecha= new Date(2015, 10, 2);
+			String add= "INSERT INTO TRANSACCION_CUENTA (NUMERO_TRANSACCION, NUM_CUENTA, CANTIDAD, TIPO, FECHA) VALUES ("+idcuenta*cant+","+idcuenta+","+cant+","+tipo+","+fecha+")";
+			prepStmt=conexion.prepareStatement(add);
+			ResultSet  rs = prepStmt.executeQuery();
+			System.out.println("ok1");
+			
+			if(tipo.equals("Consignar")&& idcuenta>0 && cant>0){
+				add="UPDATE CUENTA  SET CANTIDADDINERO = CANTIDADDINERO+"+cant+"WHERE NUMERO='"+idcuenta+"'";
+				prepStmt= conexion.prepareStatement(add);
+				rs = prepStmt.executeQuery();
+				System.out.println("ok2");
+			}
+			if(tipo.equals("Retirar")){
+				add="UPDATE CUENTA  SET CANTIDADDINERO = CANTIDADDINERO-"+cant+"WHERE NUMERO='"+idcuenta+"'";
+				prepStmt=conexion.prepareStatement(add);
+				 rs = prepStmt.executeQuery();
+				 System.out.println("ok2");
+			}
+			if(tipo.equals("Eliminar")){
+				add="UPDATE CUENTA  SET CANTIDADDINERO = 0 WHERE NUMERO='"+idcuenta+"'"
+				prepStmt=conexion.prepareStatement(add);
+				 rs = prepStmt.executeQuery();
+				 System.out.println("ok2");
+				
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	public void hacerTransCred(int numtras, int codcred,int cant,String tipo){
+		PreparedStatement prepStmt = null;
+		try {
+			
+			if(tipo.equals("Pagar cuota")||tipo.equals("Pagar cuota extraordinaria")){
+				prepStmt=conexion.prepareStatement("UPDATE CREDITO  SET CANTIDADDINERO = CANTIDADDINERO-"+cant+"WHERE CODIGO='"+codcred+"'");
+				ResultSet rs = prepStmt.executeQuery();
+			}
+			if(tipo.equals("Rechazar")){
+				prepStmt=conexion.prepareStatement("UPDATE CUENTA  SET CANTIDADDINERO = 0 WHERE CODIGO='"+codcred+"'");
+				ResultSet rs = prepStmt.executeQuery();
+			}
+			if(tipo.equals("Cerrar")){
+				prepStmt=conexion.prepareStatement("UPDATE CUENTA  SET CANTIDADDINERO = 0 WHERE CODIGO='"+codcred+"'");
+				ResultSet rs = prepStmt.executeQuery();
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+
+}

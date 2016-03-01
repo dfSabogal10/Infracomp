@@ -1,0 +1,146 @@
+package co.edu.uniandes.iteracion2.servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import co.edu.uniandes.iteracion2.fachada.BancAndes;
+import co.edu.uniandes.iteracion2.fachada.Usuario;
+
+
+public class AdminServlet extends HttpServlet{
+	private static final long serialVersionUID = 1L;
+	private Usuario usuarioM;
+	BancAndes banco;
+	
+	public AdminServlet(){
+		banco = new BancAndes();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		
+		procesarPedido(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+
+		procesarPedido(request, response);
+	}
+	
+    private void procesarPedido( HttpServletRequest request, HttpServletResponse response ) throws IOException
+    {
+    	//TODO Si hay otras fachadas, ellas tambien deben inicializar la ruta.
+    	//VideoAndes.darInstancia().inicializarRuta(this.getServletContext().getRealPath(((HttpServletRequest) this.getServletContext()).getContextPath()));
+
+        imprimirHeader( request, response );
+        
+        String usuario = request.getParameter("usuario");
+        String contrasenia = request.getParameter("contrasenia");
+        
+        if(usuario.equals("Login Como Administrador")){
+        	if(contrasenia.equals("1234")){
+        	escribirContenidoAdmin( request, response );
+        	String numero = banco.numeroCuentas()+"";
+        	System.out.println(numero);
+        	}
+        	else{
+//            	escribirError(request, response);
+        		escribirContenidoAdmin( request, response );
+            	String numero = banco.numeroCuentas()+"";
+            	System.out.println(numero);
+            }
+        }
+        
+        if(usuario.equals("Login Como Cliente")){
+        	escribirContenidoCliente( request, response );
+        	String numero = banco.numeroCuentas()+"";
+        	System.out.println(numero);
+        }
+        if(usuario.equals("Login Como Gerente")){
+        	escribirContenidoGerente( request, response );
+        }
+        if(usuario.equals("Login Como Cajero")){
+        	escribirContenidoCajero( request, response );
+        }
+        
+        
+        
+        imprimirFooter( response );
+		
+	}
+
+	
+
+	private void imprimirHeader(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		
+        PrintWriter respuesta = response.getWriter( );
+        respuesta.println( "<html>" );
+        respuesta.println( "<head>" );
+		
+	}
+	private void imprimirFooter(HttpServletResponse response) throws IOException {
+
+        PrintWriter respuesta = response.getWriter( );
+        respuesta.println( "</html>" );
+		
+	}
+	private void escribirContenidoAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String login = request.getParameter("login");
+        PrintWriter respuesta = response.getWriter( );
+       respuesta.println(login+ " ADMINISTRADOR<br>");
+       respuesta.println("<form method =\"post\" action=\"botonesAdmin.htm\" >");
+       respuesta.println("<input type=\"submit\" value= \"Resgistrar Oficina\" name =\"botonesadministrador\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Registrar Punto de Atencion\" name=\"botonesadministrador\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Registrar Usuario\" name=\"botonesadministrador\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"ConsultarCuenta\" name=\"botonesadministrador\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"ConsultarCliente\" name=\"botonesadministrador\"><br>");
+       respuesta.println("</form>");
+       
+	}
+
+	private void escribirContenidoGerente(HttpServletRequest request, HttpServletResponse response)throws IOException  {
+		String login = request.getParameter("login");
+        PrintWriter respuesta = response.getWriter( );
+       respuesta.println(login+ " GERENTE<br>");
+       respuesta.println("<form method =\"post\" action=\"botonesGerente.htm\" >");
+       respuesta.println("<input type=\"submit\" value= \"Registrar Cuenta\" name =\"botonergerente\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Cerrar Cuenta\" name=\"botonergerente\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Registrar Operacion\" name=\"botonergerente\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Registrar Prestamo\" name=\"botonergerente\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Cerrar Prestamo\" name=\"botonergerente\"><br>");
+       respuesta.println("</form>");
+	}
+
+	private void escribirContenidoCliente(HttpServletRequest request, HttpServletResponse response)throws IOException  {
+		String login = request.getParameter("login");
+        PrintWriter respuesta = response.getWriter( );
+       respuesta.println(login+ " CLIENTE<br>");
+       respuesta.println("<form method =\"post\" action=\"botonesCliente.htm\" >");
+       respuesta.println("<input type=\"submit\" value= \"Registrar Operacion\" name =\"botonescliente\"><br>");
+       respuesta.println("<input type=\"submit\" value= \"Asociar Cuenta de Persona Natural\" name =\"botonescliente\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Consultar Cuenta\" name=\"botonescliente\"><br>");
+       respuesta.println("<input type=\"submit\" value=\"Pagar Empleados\" name=\"botonescliente\"><br>");
+       respuesta.println("</form>");
+	}
+	private void escribirContenidoCajero(HttpServletRequest request, HttpServletResponse response)throws IOException  {
+		String login = request.getParameter("login");
+        PrintWriter respuesta = response.getWriter( );
+       respuesta.println(login+ " CAJERO<br>");
+       respuesta.println("<form method =\"post\" action=\"botonesCajero.htm\" >");
+       respuesta.println("<input type=\"submit\" value= \"BOTON\" name =\"botonesCajero\"><br>");
+       respuesta.println("</form>");
+	}
+//	private void escribirError(HttpServletRequest request, HttpServletResponse response)throws IOException {
+//
+//           PrintWriter respuesta = response.getWriter( );
+//	       respuesta.println("contraseña erronea");
+//	}
+
+}
